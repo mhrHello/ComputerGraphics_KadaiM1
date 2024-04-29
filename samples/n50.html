@@ -1,0 +1,82 @@
+<html>
+<head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            overflow: hidden;
+            background: #292a33;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
+    <script>
+        let n, t;
+        let samples = [];
+        let points = [];
+
+        function f(x, height, width) {
+            let u = (4/width) * x - 2.8;
+            let t = - u * u * u - 2 * u * u + u + Math.sin(7 * u);
+            let y = (height/10) * t + 0.6 * height;
+
+            return y;
+        }
+
+        function setup() {
+            createCanvas(window.innerWidth, window.innerHeight);
+            t = 0;
+
+            n = 51;
+            for(let i = 0; i < n; i++){
+                let x = (i * width / n) + (width / (2 * n));
+                p = { x: x, y: f(x, height, width) };
+                samples.push(p);
+                if(i === 0) points.push(p);
+            }
+
+            strokeWeight(2);
+            stroke("#f0f0f0");
+            noFill();
+            for(let i = 0; i<999;i++) {
+                let x1 = i * width / 1000;
+                let x2 = (i+1) * width / 1000;
+                let y1 = f(x1, height, width);
+                let y2 = f(x2, height, width);
+                line(x1, y1, x2, y2);
+            }
+
+            points = [samples[0]];
+            while(t <= 1) {
+                t += 0.004;
+                let p = mybezier(n, t, samples);
+                points.push(p);
+            }
+
+            strokeWeight(4);
+            stroke("#00ECFF");
+            noFill();
+            for(let i = 0; i < points.length - 1; i++) {
+                line(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+            }
+        }
+
+        function mybezier(n, t, ary) {
+            if (n === 2) {
+                return { x: lerp(ary[0].x, ary[1].x, t), y: lerp(ary[0].y, ary[1].y, t) };
+            }
+
+            let recary = [];
+            for(let i = 0; i < n - 1; i++){
+                const p = { x: lerp(ary[i].x, ary[i+1].x, t), y: lerp(ary[i].y, ary[i+1].y, t) };
+                recary.push(p);
+            }
+
+            return mybezier(n-1, t, recary);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

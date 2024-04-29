@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>コンピュータグラフィクス論 基本課題M1</title>
+        <link rel="stylesheet" href="style.css">
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </head>
+    <body>
+        <h1>コンピュータグラフィクス論 基本課題M1</h1>
+        <div style="text-align: right;">05-231027 森裕淳</div>
+
+        <h2>描画の方法</h2>
+        <p>p5.jsというHTMLの描画ライブラリを用いました。
+            p5.jsとはProcessingというビジュアルアートなどで利用されるJavaベースのプログラミング言語をJavaScriptに移植したものです。
+            個人的な事情でProcessingに使い慣れていたということや、
+            配布されたGlitchのソースコードではライブラリの参照をしていた都合上コードの全容を理解できなかったなどの理由から今回はp5.jsを使いました。
+            p5.jsの詳しいことは<a href="https://p5js.org/" target="_blank">公式ドキュメント</a>をご覧ください。
+        </p>
+
+        <h2>参考にしたもの</h2>
+        <p>以下を参考にしました。</p>
+        <ol>
+            <li><a href="https://p5js.org/" target="_blank">p5.jsの公式ドキュメント</a></li>
+            <li><a href="https://zenn.dev/baroqueengine/books/a19140f2d9fc1a/viewer/d0f81a" target="_blank">クリエイティブコーディングの教科書</a></li>
+        </ol>
+        <p>
+            特に2.の<a href="https://zenn.dev/baroqueengine/books/a19140f2d9fc1a/viewer/13ad2f" target="_blank">Chapter33</a>にはベジェ曲線の描画に関することが載っており、以下で行ったベジェ曲線の描画はこれを参考にしています。
+            そのためコードの内容が酷似していることは認めますが、
+            もちろん内容は理解して課題のために適切な変更はしたつもりです。
+        </p>
+
+        <h2>2次ベジェ曲線の描画</h2>
+        <p>De Casteljauのアルゴリズムを用いて書きました。
+        そのことがわかるよう内分点にも線を引いています。</p>
+        <p class="codepen" data-height="300" data-default-tab="html,result" data-slug-hash="NWmmwLW" data-user="mhrHello" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+            <span>See the Pen <a href="https://codepen.io/mhrHello/pen/NWmmwLW">
+            Untitled</a> by mhrHello (<a href="https://codepen.io/mhrHello">@mhrHello</a>)
+            on <a href="https://codepen.io">CodePen</a>.</span>
+        </p>
+        <script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+
+        <h2>高次ベジェ曲線の描画</h2>
+        <p>
+            一般の\(n\)次ベジェ曲線の描画も行いました。
+            方法はDe Casteljauのアルゴリズムによるもので、以下に掲載したコードではJS内の
+            関数<code>mybezier</code>の中で適切な点を再帰的に計算しています。
+
+            また下にあるソースコードでは曲線 \(y=x^3+2x^2-x-\sin 7x\) を画面サイズに合わせて適当に正規化したものから等間隔に点をプロットしてベジェ曲線の描画を行っています。
+            ソースコードのJSの行数で言えば17行目、関数<code>setup</code>の中で
+            設定しているグローバル変数<code>n</code>の値を変えることで、
+            その値から1を引いた次数のベジェ曲線が描画されるようになっています。
+            ちなみに下のコードでは現状<code>n=10</code>としており、9次のベジェ曲線が描画されています。
+        </p>
+        <p class="codepen" data-height="300" data-default-tab="html,result" data-slug-hash="vYMMWMv" data-user="mhrHello" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+            <span>See the Pen <a href="https://codepen.io/mhrHello/pen/vYMMWMv">
+            Untitled</a> by mhrHello (<a href="https://codepen.io/mhrHello">@mhrHello</a>)
+            on <a href="https://codepen.io">CodePen</a>.</span>
+        </p>
+        <script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+
+        <h2>Bernstein多項式について</h2>
+        <p>
+            本来ベジェ曲線はBernstein多項式を用いて定義されていました。以下では、Bernstein多項式とベジェ曲線の関係について考察するので、
+            まずBernstein基底にそのものについて見ていきます。
+            一般に<b>Bernstein多項式</b>とは正の整数 \(n\) と \(0\leq i\leq n\) にパラメータづけられた多項式
+            $$ b_n^i(x)=\binom{n}{i}x^i(1-x)^i $$
+            として定まります。これに対して \([0,1]\) 上の実連続関数 \(f(x)\) が与えられたとき、
+            <b>\(f\) に付随するBernstein多項式</b> \(B_n(f)\) が、
+            $$ B_n(f)(x)=\sum_{i=0}^n f\left(\frac{i}{n}\right)b_n^i(x) $$
+            として定義されます。Bernstein多項式の数学的な側面での有用性は、これが多項式近似を与えるということに
+            尽きます。すなわち、\([0,1]\) 上の実連続関数のなす \(\mathbb{R}\)-代数に \(L^\infty\)-ノルムを入れたときに、
+            このノルムにおいて \(B_n(f)\to f\) が成り立ち、これによりWeierstrassの多項式近似定理が明示的に証明されます。
+            詳しい証明は<a href="https://loss.math.gatech.edu/16FALLTEA/NOTES/weierstrassbernstein.pdf" target="_blank">こちら</a>などにあります。
+        </p>
+        <p>
+            さてベジェ曲線の定義を思い出すと、実連続関数 \(f\) に対して多項式 \(B_n(f)\)は、
+            サンプリングした点が\((0,f(0)),(\frac{1}{n},f(\frac{1}{n})),\ldots,(1,f(1))\) であるようなベジェ曲線に他なりません。
+            このことはある曲線上の点からサンプリングを行ったベジェ曲線は、サンプル数を大きくするともとの曲線に近づくという
+            我々の直観が数学的に正しいということを主張しますが、実際にそうなっていることを先ほど紹介した高次ベジェ曲線の描画プログラムを用いて実際に確かめたところ、
+            確かにそうなっていることがわかりました。以下の図では白い線が高次ベジェ曲線の描画で用いたものと同様の曲線
+            \(y=x^3+2x^2-x-\sin 7x\) を画面サイズに合わせて適当に正規化したものであり、
+            青い線がそこから等間隔にサンプリングしたベジェ曲線になります。
+        </p>
+        <div class="iframe-container">
+            <div>
+                <iframe src="samples/n10.html"></iframe>
+                <div class="caption">10次ベジェ曲線</div>
+            </div>
+            <div>
+                <iframe src="samples/n50.html"></iframe>
+                <div class="caption">50次ベジェ曲線</div>
+            </div>
+            <div>
+                <iframe src="samples/n500.html"></iframe>
+                <div class="caption">500次ベジェ曲線</div>
+            </div>
+        </div>
+
+        <h2>Bernstein多項式による計算とDe Casteljauのアルゴリズムとの比較</h2>
+        <p>
+            ベジェ曲線はBernstein多項式を用いても定義することができるので、
+            その描画方法としてベジェ曲線が有する幾何学的な構造を用いずとも解析的な式から直接描画することもできます。
+
+            この方法は解析的な式に則って計算するだけなので計算量の観点から見れば幾何学的な方法よりも優れていると考えられますが、
+            一方で多項式は次数が大きくなれば大きい値ですぐに値が爆発してしまうので解析的な表示を用いた計算方法は幾何学的な方法よりも精度上劣ることが容易に想像つきます。
+            このことを実験的に確かめましょう。
+        </p>
+        <p>
+            以下は高次ベジェ曲線のところで用いたものと同じ曲線に対して、
+            Bernstein多項式を使って計算したベジェ曲線の描画も合わせたものです。
+            青色の線がこれまで通りのDe Casteljauのアルゴリズムによるもので、
+            赤色の線がBernstein多項式を用いて計算したベジェ曲線になります。
+            確かにもとの曲線と比べて赤色の曲線は端の方で補間の精度が落ちていることが分かります。
+        </p>
+        <p class="codepen" data-height="300" data-default-tab="html,result" data-slug-hash="yLrrvVR" data-user="mhrHello" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+            <span>See the Pen <a href="https://codepen.io/mhrHello/pen/yLrrvVR">
+            Untitled</a> by mhrHello (<a href="https://codepen.io/mhrHello">@mhrHello</a>)
+            on <a href="https://codepen.io">CodePen</a>.</span>
+          </p>
+        <script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+        <p>
+            ここでは、ベジェ曲線を計算する際にDe Casteljauのアルゴリズムの方が精度の高さでBernstein多項式よりも優れているということを見ましたが、
+            Bernstein多項式には多項式による曲線の補間という側面もあります。
+            この点で捉えると実はBernstein多項式は数値解析的な安定性の意味で多項式関数の族としては最も優れているものの一つであることが<a href="https://www.sciencedirect.com/science/article/abs/pii/0167839687900124" target="_blank">Farouki, Rajan(1978)</a>などの研究で知られており、
+            Bernstein多項式による方法は多項式関数による計算の中では精度的に良いものであるということを指摘してこのレポートを終わりたいと思います。
+        </p>
+    </body>
+</html>
